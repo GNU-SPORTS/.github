@@ -215,7 +215,7 @@
 </h2>
 <details>
 <summary>
-<h3>✨현재위치기반의 날씨 정보(안드로이드)</h3>
+<h3> ✨ 현재위치기반의 날씨 정보(안드로이드)</h3>
 </summary>
 <div markdown="1">
 
@@ -227,6 +227,55 @@
 | 날씨 | 
 | ------------ | 
 |<img src="https://github.com/GNU-SPORTS/SPORTS-CLIENT-APP/assets/97229292/183b8644-3355-4fe7-8063-8a07286e8bfd" width="250" height="500"/>| 
+
+</div>
+</details>
+
+
+<h2 id="5">
+
+</h2>
+<details>
+<summary>
+<h3> ✨ JWT 토큰을 이용한 인증,인가 서버 구축</h3>
+</summary>
+<div markdown="1">
+	
+   - JWT와 Spring Security를 이용한 서버 구축
+   - JWT토큰 생성시 HMAC512 즉,SHA-512 해시 함수를 이용한 토큰 암호화.   
+   - 인증필터(UsernamePasswordAuthenticationFilter), 권한 허가 필터(BasicAuthenticationFilter) 상속 후 직접 메소드 오버라이딩       
+
+```
+@Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+
+        log.info("successfulAuthentication 실행됨 : 인증이 완료되었다는 뜻임.");
+        PrincipalDetails principalDetailis = (PrincipalDetails) authResult.getPrincipal();
+
+        //hash 암호 방식
+        String jwtToken = JWT.create()
+                .withSubject(principalDetailis.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
+                .withClaim("id", principalDetailis.getUser().getId())
+                .withClaim("username", principalDetailis.getUser().getUsername())
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX+jwtToken);
+        CustomResponseUtil.success(response, principalDetailis.getUser());
+    }
+```
+
+### Autentication 인증
+  - Authentication 요청(로그인 요청)이 발생하면 서버에서 attemptAuthentication() 함수가 실행된다. 그러면 해당 유저의 정보를 오브젝트로 파싱 후, UsernamePasswordAuthenticationToken() 객체를 생성한다.
+  -  그러면 PrincipalService의 loadUserByUsername() 함수가 실행되어 DB를 확인 후 Authentication 객체를 만들어낸다. 그럼 해당 정보를 가져올수있다. PrincipalDetails 즉, DB에서 해당 유저를 찾은 것이다.   
+  - 그 이후 successfulAuthentication() 함수가 실행되며 메소드 오버라이딩에 의해 재정의된 메소드에서 위에서 만든 PrincipalDetails 를 암호화 JWT토큰을 만드는 과정을 진행한다.
+  - 이 때 JWT 암호화 방식은 HMAC512 즉,SHA-512 해시 함수를 이용한 해시 암호화 방식을 사용한다. 이렇게 함으로써 조금 더 안전한 서버만의 유저 인증을 식별하는 JWT 토큰이 만들어지게 되고 Response 헤더에 이 토큰을 담아서 보낸다.   
+
+### Authorizaiton 인가
+  - 내가 직접 설정한 Spring SecurityConfig에서 authorizeHttpRequests() 의 처리해 놓은 부분(인가가 필요한 요청)에 걸치게 되면 바로 authorization에서 허가 작업이 진행된다.    
+  - 처음으로 인증 권한이 필요한 주소요청이 있을 때 Security 권한 허가 필터 객체인 BasicAuthenticationFilter의 doFilterInternal() 필터를 거치게 되는데 여기서 메소드 오버라이딩을 이용해 재정의한다.
+  -  내가 지정한 Bearer 타입의 토큰 유무를 검사하고 다음으로 Bearer를 떼어내고 서버의 개인키를 이용해서 복호화를 진행한다. 그리고 토큰에 서명된 정보가 정상적인 정보인지 확인을 거친다.
+  -  그리고 이 서명 정보가 정상적이라면, UsernamePasswordAuthenticationToken() 객체를 만들어 강제로 시큐리티 세션에 접근하여 authentication 객체를 저장해준다. 이유는 UserDetailsService를 호출하지 않기 때문에 @AuthenticationPrincipal 사용 불가능. 스프링 시큐리티가 수행해주는 권한 처리를 위해 아래와 같이 토큰을 만들어서 Authentication 객체를 강제로 만들고 그걸 세션에 저장!
 
 </div>
 </details>
