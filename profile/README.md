@@ -242,8 +242,9 @@
 <div markdown="1">
 	
    - JWT와 Spring Security를 이용한 서버 구축
-   - JWT토큰 생성시 HMAC512 즉,SHA-512 해시 함수를 이용한 토큰 암호화.   
-   - 인증필터(UsernamePasswordAuthenticationFilter), 권한 허가 필터(BasicAuthenticationFilter) 상속 후 직접 메소드 오버라이딩       
+   - JWT토큰 생성시 HMAC512 즉,SHA-512 해시 함수를 이용한 인증 토큰 생성.   
+   - 대칭키 (Symmetric Key) 암호화 알고리즘 방식이다. 서버와 클라이언트 간에 같은 비밀 키를 사용하여 데이터를 암호화하고 복호화한다.    
+   - 인증필터(UsernamePasswordAuthenticationFilter), 권한 허가 필터(BasicAuthenticationFilter) 상속 후 직접 메소드 오버라이딩         
 
 ```
 @Override
@@ -267,9 +268,9 @@
 
 ### Autentication 인증
   - Authentication 요청(로그인 요청)이 발생하면 서버에서 attemptAuthentication() 함수가 실행된다. 그러면 해당 유저의 정보를 오브젝트로 파싱 후, UsernamePasswordAuthenticationToken() 객체를 생성한다.
-  -  그러면 PrincipalService의 loadUserByUsername() 함수가 실행되어 DB를 확인 후 Authentication 객체를 만들어낸다. 그럼 해당 정보를 가져올수있다. PrincipalDetails 즉, DB에서 해당 유저를 찾은 것이다.   
+  - 그러면 PrincipalService의 loadUserByUsername() 함수가 실행되어 DB를 확인 후 Authentication 객체를 만들어낸다. 그럼 해당 정보를 가져올수있다. PrincipalDetails 즉, DB에서 해당 유저를 찾은 것이다.   
   - 그 이후 successfulAuthentication() 함수가 실행되며 메소드 오버라이딩에 의해 재정의된 메소드에서 위에서 만든 PrincipalDetails 를 암호화 JWT토큰을 만드는 과정을 진행한다.
-  - 이 때 JWT 암호화 방식은 HMAC512 즉,SHA-512 해시 함수를 이용한 해시 암호화 방식을 사용한다. 이렇게 함으로써 조금 더 안전한 서버만의 유저 인증을 식별하는 JWT 토큰이 만들어지게 되고 Response 헤더에 이 토큰을 담아서 보낸다.   
+  - 이 때 JWT 인증 토큰 생성 방식은 HMAC512 즉,SHA-512 해시 함수를 이용한다. 이렇게 함으로써 조금 더 안전한 서버만의 유저 인증을 식별하는 JWT 인증 토큰이 만들어지게 되고 Response 헤더에 이 토큰을 담아서 보낸다.   
 
 ### Authorizaiton 인가
   - 내가 직접 설정한 Spring SecurityConfig에서 authorizeHttpRequests() 의 처리해 놓은 부분(인가가 필요한 요청)에 걸치게 되면 바로 authorization에서 허가 작업이 진행된다.    
