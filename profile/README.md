@@ -275,7 +275,8 @@
   - 내가 직접 설정한 Spring SecurityConfig에서 authorizeHttpRequests() 의 처리해 놓은 부분(인가가 필요한 요청)에 걸치게 되면 바로 authorization에서 허가 작업이 진행된다.    
   - 처음으로 인증 권한이 필요한 주소요청이 있을 때 Security 권한 허가 필터 객체인 BasicAuthenticationFilter의 doFilterInternal() 필터를 거치게 되는데 여기서 메소드 오버라이딩을 이용해 재정의한다.
   -  내가 지정한 Bearer 타입의 토큰 유무를 검사하고 다음으로 Bearer를 떼어내고 서버의 개인키를 이용해서 복호화를 진행한다. 그리고 토큰에 서명된 정보가 정상적인 정보인지 확인을 거친다.
-  -  그리고 이 서명 정보가 정상적이라면, UsernamePasswordAuthenticationToken() 객체를 만들어 강제로 시큐리티 세션에 접근하여 authentication 객체를 저장해준다. 이유는 UserDetailsService를 호출하지 않기 때문에 @AuthenticationPrincipal 사용 불가능. 스프링 시큐리티가 수행해주는 권한 처리를 위해 아래와 같이 토큰을 만들어서 Authentication 객체를 강제로 만들고 그걸 세션에 저장!
+  -  그리고 이 서명 정보가 정상적이라면, UsernamePasswordAuthenticationToken() 객체를 만들어 강제로 시큐리티 세션에 접근하여 authentication 객체를 저장해준다.
+  -  이유는 Authorizaiton은 UserDetailsService를 호출하지 않기 때문에 @AuthenticationPrincipal 사용이 불가능하기 때문이다.
 
 </div>
 </details>
