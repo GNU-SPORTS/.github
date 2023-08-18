@@ -242,8 +242,8 @@
 <div markdown="1">
 	
    - JWT와 Spring Security를 이용한 서버 구축
-   - JWT토큰 생성시 HMAC512 즉,SHA-512 해시 함수를 이용한 인증 토큰 생성.   
-   - 대칭키 (Symmetric Key) 암호화 알고리즘 방식이다. 서버와 클라이언트 간에 같은 비밀 키를 사용하여 데이터를 암호화하고 복호화한다.    
+   - JWT토큰 생성시 HMAC512 즉, SHA-512 해시 함수를 이용한 인증 토큰 생성.   
+   - 대칭키 (Symmetric Key) 암호화 알고리즘 방식이다. 서버의 비밀 키를 사용하여 데이터를 암호화하고 복호화한다.    
    - 인증필터(UsernamePasswordAuthenticationFilter), 권한 허가 필터(BasicAuthenticationFilter) 상속 후 직접 메소드 오버라이딩         
 
 ```
